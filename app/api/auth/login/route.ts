@@ -7,6 +7,10 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json();
+    
+    // デバッグ用ログ（本番環境では削除してください）
+    console.log("環境変数 ADMIN_PASSWORD:", process.env.ADMIN_PASSWORD);
+    console.log("入力されたパスワード:", password);
 
     if (!password) {
       return NextResponse.json(
