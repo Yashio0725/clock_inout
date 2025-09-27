@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import PunchButton from "@/components/PunchButton";
 import ImageCard from "@/components/ImageCard";
 
@@ -16,6 +17,7 @@ export default function PunchPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [todayRecords, setTodayRecords] = useState<AttendanceRecord[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const router = useRouter();
 
   // 現在時刻を1秒ごとに更新
   useEffect(() => {
@@ -86,12 +88,35 @@ export default function PunchPage() {
     });
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+      
+      if (response.ok) {
+        router.push("/login");
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("ログアウトエラー:", error);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4">
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl shadow-2xl p-8 border border-slate-700">
-        <h1 className="text-3xl font-bold text-white mb-8 text-center tracking-wide">
-          勤怠管理システム
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-white tracking-wide">
+            勤怠管理システム
+          </h1>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors shadow-lg shadow-red-900/30"
+          >
+            ログアウト
+          </button>
+        </div>
         
         {/* 現在時刻表示 */}
         <div className="text-center mb-8 bg-slate-800/50 rounded-lg p-6 border border-slate-600">
