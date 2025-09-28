@@ -1,5 +1,4 @@
-import fs from "fs/promises";
-import path from "path";
+import { Redis } from "@upstash/redis";
 import * as ExcelJS from "exceljs";
 
 interface AttendanceRecord {
@@ -9,54 +8,48 @@ interface AttendanceRecord {
   date: string;
 }
 
-const DATA_FILE = path.join(process.cwd(), "data", "attendance.json");
+// Upstash Redis クライアントを初期化
+const redis = Redis.fromEnv();
 
-// データディレクトリが存在しない場合は作成
-async function ensureDataDirectory() {
-  const dataDir = path.dirname(DATA_FILE);
-  try {
-    await fs.access(dataDir);
-  } catch {
-    await fs.mkdir(dataDir, { recursive: true });
-  }
-}
+const RECORDS_KEY = "attendance_records";
 
 // 記録を保存
 export async function saveRecord(record: AttendanceRecord): Promise<void> {
-  await ensureDataDirectory();
-  
-  let records: AttendanceRecord[] = [];
-  
   try {
-    const data = await fs.readFile(DATA_FILE, "utf-8");
-    records = JSON.parse(data);
+    // 既存の記録を取得
+    const existingRecords = await getRecords();
+    
+    // 新しい記録を追加
+    const updatedRecords = [...existingRecords, record];
+    
+    // 日付と時刻でソート
+    updatedRecords.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    
+    // Redisに保存
+    await redis.set(RECORDS_KEY, JSON.stringify(updatedRecords));
   } catch (error) {
-    // ファイルが存在しない場合は空の配列から開始
-    records = [];
+    console.error("記録保存エラー:", error);
+    throw new Error("記録の保存に失敗しました");
   }
-  
-  records.push(record);
-  
-  // 日付と時刻でソート
-  records.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-  
-  await fs.writeFile(DATA_FILE, JSON.stringify(records, null, 2));
 }
 
 // 記録を取得
 export async function getRecords(): Promise<AttendanceRecord[]> {
-  await ensureDataDirectory();
-  
   try {
-    const data = await fs.readFile(DATA_FILE, "utf-8");
-    const records = JSON.parse(data);
+    const data = await redis.get(RECORDS_KEY);
+    
+    if (!data) {
+      return [];
+    }
+    
+    const records = typeof data === 'string' ? JSON.parse(data) : data;
     
     // 日付と時刻でソート
     return records.sort((a: AttendanceRecord, b: AttendanceRecord) => 
       new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
     );
   } catch (error) {
-    // ファイルが存在しない場合は空の配列を返す
+    console.error("記録取得エラー:", error);
     return [];
   }
 }
@@ -176,7 +169,7 @@ export async function deleteRecord(id: string): Promise<boolean> {
       return false; // 削除する記録が見つからない
     }
     
-    await fs.writeFile(DATA_FILE, JSON.stringify(filteredRecords, null, 2));
+    await redis.set(RECORDS_KEY, JSON.stringify(filteredRecords));
     return true;
   } catch (error) {
     console.error("記録削除エラー:", error);
