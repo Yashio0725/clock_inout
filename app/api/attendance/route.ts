@@ -7,15 +7,15 @@ export async function POST(request: NextRequest) {
     
     if (!type || typeof type !== "string") {
       return NextResponse.json(
-        { error: "打刻タイプが指定されていません" },
+        { error: "Punch type is not specified" },
         { status: 400 }
       );
     }
 
-    const validTypes = ["出勤", "退勤", "休憩開始", "休憩終了"];
+    const validTypes = ["Clock In", "Clock Out", "Away From Keyboard", "Back", "出勤", "退勤", "休憩開始", "休憩終了"];
     if (!validTypes.includes(type)) {
       return NextResponse.json(
-        { error: "無効な打刻タイプです" },
+        { error: "Invalid punch type" },
         { status: 400 }
       );
     }
@@ -32,14 +32,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `${type}を記録しました`,
-      timestamp: new Date(timestamp).toLocaleString("ja-JP"),
+      message: `${type} recorded successfully`,
+      timestamp: new Date(timestamp).toLocaleString("en-US", { hour12: false }),
       record,
     });
   } catch (error) {
-    console.error("打刻エラー:", error);
+    console.error("Punch error:", error);
     return NextResponse.json(
-      { error: "サーバーエラーが発生しました" },
+      { error: "Server error occurred" },
       { status: 500 }
     );
   }
@@ -52,12 +52,13 @@ export async function GET() {
     
     return NextResponse.json(records);
   } catch (error) {
-    console.error("記録取得エラー:", error);
+    console.error("Record fetch error:", error);
     return NextResponse.json(
-      { error: "記録の取得に失敗しました" },
+      { error: "Failed to fetch records" },
       { status: 500 }
     );
   }
 }
+
 
 

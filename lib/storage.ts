@@ -13,6 +13,17 @@ const redis = Redis.fromEnv();
 
 const RECORDS_KEY = "attendance_records";
 
+// Convert Japanese record types to English
+function normalizeRecordType(type: string): string {
+  const typeMapping: { [key: string]: string } = {
+    "出勤": "Clock In",
+    "退勤": "Clock Out",
+    "休憩開始": "Away From Keyboard",
+    "休憩終了": "Back"
+  };
+  return typeMapping[type] || type;
+}
+
 // 記録を保存
 export async function saveRecord(record: AttendanceRecord): Promise<void> {
   try {
@@ -28,8 +39,8 @@ export async function saveRecord(record: AttendanceRecord): Promise<void> {
     // Redisに保存
     await redis.set(RECORDS_KEY, JSON.stringify(updatedRecords));
   } catch (error) {
-    console.error("記録保存エラー:", error);
-    throw new Error("記録の保存に失敗しました");
+    console.error("Record save error:", error);
+    throw new Error("Failed to save record");
   }
 }
 
@@ -44,12 +55,17 @@ export async function getRecords(): Promise<AttendanceRecord[]> {
     
     const records = typeof data === 'string' ? JSON.parse(data) : data;
     
-    // 日付と時刻でソート
-    return records.sort((a: AttendanceRecord, b: AttendanceRecord) => 
+    // 記録タイプを英語に正規化し、日付と時刻でソート
+    const normalizedRecords = records.map((record: AttendanceRecord) => ({
+      ...record,
+      type: normalizeRecordType(record.type)
+    }));
+    
+    return normalizedRecords.sort((a: AttendanceRecord, b: AttendanceRecord) => 
       new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
     );
   } catch (error) {
-    console.error("記録取得エラー:", error);
+    console.error("Record fetch error:", error);
     return [];
   }
 }
@@ -59,28 +75,28 @@ export async function exportToExcel(records: AttendanceRecord[]): Promise<Buffer
   // ワークブックを作成
   const workbook = new ExcelJS.Workbook();
   
-  // 勤怠記録シートを作成
-  const worksheet = workbook.addWorksheet("勤怠記録");
+  // Attendance Records Sheet
+  const worksheet = workbook.addWorksheet("Attendance Records");
   
-  // ヘッダー行を設定
+  // Set header row
   worksheet.columns = [
-    { header: "日付", key: "date", width: 12 },
-    { header: "時刻", key: "time", width: 10 },
-    { header: "区分", key: "type", width: 12 },
-    { header: "タイムスタンプ", key: "timestamp", width: 20 },
+    { header: "Date", key: "date", width: 12 },
+    { header: "Time", key: "time", width: 10 },
+    { header: "Type", key: "type", width: 20 },
+    { header: "Timestamp", key: "timestamp", width: 25 },
   ];
   
-  // データを追加
+  // Add data
   records.forEach(record => {
     worksheet.addRow({
-      date: new Date(record.timestamp).toLocaleDateString("ja-JP"),
-      time: new Date(record.timestamp).toLocaleTimeString("ja-JP"),
+      date: new Date(record.timestamp).toLocaleDateString("en-US"),
+      time: new Date(record.timestamp).toLocaleTimeString("en-US", { hour12: false }),
       type: record.type,
       timestamp: record.timestamp,
     });
   });
   
-  // ヘッダー行のスタイルを設定
+  // Set header row style
   worksheet.getRow(1).font = { bold: true };
   worksheet.getRow(1).fill = {
     type: 'pattern',
@@ -172,7 +188,7 @@ export async function deleteRecord(id: string): Promise<boolean> {
     await redis.set(RECORDS_KEY, JSON.stringify(filteredRecords));
     return true;
   } catch (error) {
-    console.error("記録削除エラー:", error);
+    console.error("Record delete error:", error);
     return false;
   }
 }

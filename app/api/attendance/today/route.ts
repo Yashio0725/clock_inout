@@ -16,12 +16,13 @@ export async function GET() {
     
     return NextResponse.json(todayRecords);
   } catch (error) {
-    console.error("今日の記録取得エラー:", error);
+    console.error("Today's record fetch error:", error);
     return NextResponse.json(
-      { error: "今日の記録の取得に失敗しました" },
+      { error: "Failed to fetch today's records" },
       { status: 500 }
     );
   }
 }
+
 
 
