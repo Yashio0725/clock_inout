@@ -3,6 +3,7 @@ interface AttendanceRecord {
   type: string;
   timestamp: string;
   date: string;
+  comment?: string;
 }
 
 interface AdminTableProps {
@@ -23,14 +24,20 @@ export default function AdminTable({ records }: AdminTableProps) {
 
   const getTypeColor = (type: string) => {
     switch (type) {
+      case "Clock In":
       case "出勤":
         return "bg-green-100 text-green-800";
+      case "Clock Out":
       case "退勤":
         return "bg-red-100 text-red-800";
+      case "Away From Keyboard":
       case "休憩開始":
         return "bg-yellow-100 text-yellow-800";
+      case "Back":
       case "休憩終了":
         return "bg-blue-100 text-blue-800";
+      case "Comment":
+        return "bg-purple-100 text-purple-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -83,6 +90,9 @@ export default function AdminTable({ records }: AdminTableProps) {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         区分
                       </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        コメント
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -98,6 +108,9 @@ export default function AdminTable({ records }: AdminTableProps) {
                               {record.type}
                             </span>
                           </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {record.comment ?? "-"}
+                          </td>
                         </tr>
                       ))}
                   </tbody>
@@ -110,6 +123,7 @@ export default function AdminTable({ records }: AdminTableProps) {
     </div>
   );
 }
+
 
 
 

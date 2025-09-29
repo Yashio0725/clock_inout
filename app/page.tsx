@@ -23,6 +23,7 @@ interface AttendanceRecord {
   type: string;
   timestamp: string;
   date: string;
+  comment?: string;
 }
 
 export default function PunchPage() {
@@ -32,6 +33,7 @@ export default function PunchPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [comment, setComment] = useState("");
 
   // 現在時刻を1秒ごとに更新
   useEffect(() => {
@@ -86,6 +88,44 @@ export default function PunchPage() {
     } catch (error) {
       setStatus("An error occurred");
       console.error("Punch error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const sendComment = async () => {
+    if (!comment.trim()) {
+      setStatus("Please enter a comment");
+      return;
+    }
+
+    setIsLoading(true);
+    setStatus("");
+    
+    try {
+      const response = await fetch("/api/attendance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          type: "Comment", 
+          comment: comment.trim() 
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setStatus(`Comment recorded successfully (${result.timestamp})`);
+        setComment("");
+        fetchTodayRecords(); // Refetch records
+      } else {
+        const errorData = await response.json();
+        setStatus(errorData.error || "Comment recording failed");
+      }
+    } catch (error) {
+      setStatus("An error occurred");
+      console.error("Comment error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -176,6 +216,30 @@ export default function PunchPage() {
           </div>
         </div>
 
+        {/* Comment Input */}
+        <div className="mb-8">
+          <label className={`block text-sm font-medium text-slate-200 mb-2 ${orbitron.className}`}>
+            Comment
+          </label>
+          <div className="flex gap-2">
+            <textarea
+              value={comment}
+              onChange={(event) => setComment(event.target.value)}
+              placeholder="Enter your comment here..."
+              maxLength={200}
+              className="flex-1 rounded-lg border border-slate-600 bg-slate-800/60 px-4 py-3 text-slate-100 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 resize-none"
+              rows={3}
+            />
+            <button
+              onClick={sendComment}
+              disabled={isLoading || !comment.trim()}
+              className={`px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 disabled:from-slate-500 disabled:to-slate-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all duration-200 shadow-lg shadow-cyan-500/30 border border-cyan-400 ${orbitron.className}`}
+            >
+              Send
+            </button>
+          </div>
+        </div>
+
         {/* Punch Buttons */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <PunchButton
@@ -232,7 +296,19 @@ export default function PunchPage() {
                   key={record.id}
                   className="flex justify-between items-center bg-slate-700/50 p-4 rounded-lg border border-slate-600 hover:bg-slate-700/70 transition-colors"
                 >
-                  <span className={`font-medium text-white ${orbitron.className}`}>{record.type}</span>
+                  <div className="flex-1 min-w-0">
+                    {record.type === "Comment" ? (
+                      <div>
+                        <span className={`font-medium text-white block ${orbitron.className}`}>
+                          {record.comment}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className={`font-medium text-white ${orbitron.className}`}>
+                        {record.type}
+                      </span>
+                    )}
+                  </div>
                   <span className={`text-cyan-300 font-mono text-sm ${orbitron.className}`}>
                     {formatTime(record.timestamp)}
                   </span>

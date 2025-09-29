@@ -6,6 +6,7 @@ interface AttendanceRecord {
   type: string;
   timestamp: string;
   date: string;
+  comment?: string;
 }
 
 // Upstash Redis クライアントを初期化
@@ -83,6 +84,7 @@ export async function exportToExcel(records: AttendanceRecord[]): Promise<Buffer
     { header: "Date", key: "date", width: 12 },
     { header: "Time", key: "time", width: 10 },
     { header: "Type", key: "type", width: 20 },
+    { header: "Comment", key: "comment", width: 32 },
     { header: "Timestamp", key: "timestamp", width: 25 },
   ];
   
@@ -92,6 +94,7 @@ export async function exportToExcel(records: AttendanceRecord[]): Promise<Buffer
       date: new Date(record.timestamp).toLocaleDateString("en-US"),
       time: new Date(record.timestamp).toLocaleTimeString("en-US", { hour12: false }),
       type: record.type,
+      comment: record.comment ?? "",
       timestamp: record.timestamp,
     });
   });
