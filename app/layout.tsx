@@ -9,7 +9,7 @@ const michroma = Michroma({
   subsets: ['latin'],
   display: 'swap',
 })
-export const orbitron = Orbitron({ 
+const orbitron = Orbitron({ 
   weight: ['400', '700'],
   subsets: ['latin'],
   display: 'swap',
