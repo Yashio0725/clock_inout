@@ -1,12 +1,23 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import Link from 'next/link'
+import { Inter, Michroma, Orbitron } from 'next/font/google'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
+const michroma = Michroma({ 
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+})
+const orbitron = Orbitron({ 
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: '勤怠管理システム',
-  description: '外部オフィス従業員の出退勤管理システム',
+  title: 'Attendance Management System',
+  description: 'Attendance tracking system for remote office employees',
 }
 
 export default function RootLayout({
@@ -21,10 +32,10 @@ export default function RootLayout({
           <header className="bg-slate-800/90 backdrop-blur-sm shadow-lg border-b border-slate-700">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center py-4">
-                <h1 className="text-2xl font-bold text-white tracking-wide">勤怠管理システム</h1>
+                <h1 className={`text-2xl font-bold text-white tracking-wide ${michroma.className}`}>Attendance Management System</h1>
                 <nav className="space-x-4">
-                  <a href="/" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">入力画面</a>
-                  <a href="/admin" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">管理画面</a>
+                  <Link href="/" className={`text-cyan-400 hover:text-cyan-300 font-medium transition-colors ${orbitron.className}`}>Punch</Link>
+                  <Link href="/admin" className={`text-cyan-400 hover:text-cyan-300 font-medium transition-colors ${orbitron.className}`}>Admin</Link>
                 </nav>
               </div>
             </div>
