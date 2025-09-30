@@ -180,7 +180,7 @@ export default function PunchPage() {
           </h1>
           <button
             onClick={handleLogout}
-            className={`px-4 py-2 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-400 hover:to-pink-500 text-white font-medium rounded-lg transition-all duration-200 shadow-lg shadow-pink-500/30 border border-pink-400 ${orbitron.className}`}
+            className={`px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-medium rounded-lg transition-all duration-200 shadow-lg shadow-orange-500/30 border border-orange-400 ${orbitron.className}`}
           >
             Logout
           </button>

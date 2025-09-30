@@ -57,10 +57,10 @@ export default function LoginForm() {
       <div className="max-w-md w-full mx-4">
         <div className="bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 border border-slate-700">
           <div className="text-center mb-8">
-            <h1 className={`text-3xl font-bold text-white mb-2 tracking-wide ${michroma.className}`}>
-              Attendance Management System
+            <h1 className={`text-2xl md:text-[1.75rem] font-bold text-white mb-4 tracking-normal leading-snug ${michroma.className}`}>
+              Attendance<br />Management System
             </h1>
-            <p className={`text-slate-400 ${orbitron.className}`}>Please enter your password</p>
+            <p className={`text-slate-400 text-base mt-2 ${orbitron.className}`}>Please enter your password</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
