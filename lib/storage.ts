@@ -1,5 +1,6 @@
 import { Redis } from "@upstash/redis";
 import * as ExcelJS from "exceljs";
+import { formatJSTDate, formatJSTTime } from "./timezone";
 
 interface AttendanceRecord {
   id: string;
@@ -91,8 +92,8 @@ export async function exportToExcel(records: AttendanceRecord[]): Promise<Buffer
   // Add data
   records.forEach(record => {
     worksheet.addRow({
-      date: new Date(record.timestamp).toLocaleDateString("en-US"),
-      time: new Date(record.timestamp).toLocaleTimeString("en-US", { hour12: false }),
+      date: formatJSTDate(record.timestamp),
+      time: formatJSTTime(record.timestamp),
       type: record.type,
       comment: record.comment ?? "",
       timestamp: record.timestamp,

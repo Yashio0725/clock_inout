@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { getRecords } from "@/lib/storage";
+import { getJSTDate } from "@/lib/timezone";
 
 export async function GET() {
   try {
     const records = await getRecords();
-    const today = new Date().toISOString().split('T')[0];
+    const today = getJSTDate(); // 日本時間の今日の日付
     
     // 今日の記録のみをフィルタリング
     const todayRecords = records.filter(record => record.date === today);

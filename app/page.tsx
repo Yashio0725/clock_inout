@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { formatJSTTime, formatJSTDate } from "@/lib/timezone";
 import { Michroma, Orbitron } from 'next/font/google';
 import PunchButton from "@/components/PunchButton";
 import ImageCard from "@/components/ImageCard";
@@ -132,24 +133,17 @@ export default function PunchPage() {
   };
 
   const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    });
+    return formatJSTTime(timestamp);
   };
 
   const formatDate = (timestamp: string) => {
-    return new Date(timestamp).toLocaleDateString("ja-JP", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
+    return formatJSTDate(timestamp);
   };
 
   const formatDateEnglish = (timestamp: string) => {
-    return new Date(timestamp).toLocaleDateString("en-US", {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString("en-US", {
+      timeZone: "Asia/Tokyo",
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -193,7 +187,8 @@ export default function PunchPage() {
             className={`text-5xl font-bold text-cyan-400 mb-3 tracking-wider ${orbitron.className}`}
           >
             {mounted
-              ? currentTime.toLocaleTimeString("en-US", {
+              ? currentTime.toLocaleTimeString("ja-JP", {
+                  timeZone: "Asia/Tokyo",
                   hour: "2-digit",
                   minute: "2-digit",
                   second: "2-digit",
@@ -206,7 +201,8 @@ export default function PunchPage() {
             className={`text-lg text-slate-300 font-medium ${orbitron.className}`}
           >
             {mounted
-              ? currentTime.toLocaleDateString("en-US", {
+              ? currentTime.toLocaleDateString("ja-JP", {
+                  timeZone: "Asia/Tokyo",
                   year: "numeric",
                   month: "long",
                   day: "numeric",

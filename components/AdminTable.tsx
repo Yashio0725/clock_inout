@@ -1,3 +1,5 @@
+import { formatJSTDateTime } from "@/lib/timezone";
+
 interface AttendanceRecord {
   id: string;
   type: string;
@@ -12,14 +14,7 @@ interface AdminTableProps {
 
 export default function AdminTable({ records }: AdminTableProps) {
   const formatDateTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString("ja-JP", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
+    return formatJSTDateTime(timestamp);
   };
 
   const getTypeColor = (type: string) => {
