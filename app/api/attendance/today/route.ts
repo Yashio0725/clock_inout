@@ -8,7 +8,11 @@ export async function GET() {
     const today = getJSTDate(); // 日本時間の今日の日付
     
     // 今日の記録のみをフィルタリング
-    const todayRecords = records.filter(record => record.date === today);
+    // UTC時刻をそのまま日付として使用（日本時間として扱う）
+    const todayRecords = records.filter(record => {
+      const recordDate = record.timestamp.split('T')[0]; // YYYY-MM-DD部分を取得
+      return recordDate === today;
+    });
     
     // 時刻順でソート
     todayRecords.sort((a, b) => 

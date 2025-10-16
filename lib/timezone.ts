@@ -6,9 +6,9 @@
  * 現在の日本時間をISO文字列で取得
  */
 export function getJSTTimestamp(): string {
+  // 日本時間を取得してISO形式で返す
   const now = new Date();
-  // 日本時間（UTC+9）に変換
-  const jstTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+  const jstTime = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9時間
   return jstTime.toISOString();
 }
 
@@ -16,7 +16,9 @@ export function getJSTTimestamp(): string {
  * 現在の日本時間の日付部分（YYYY-MM-DD）を取得
  */
 export function getJSTDate(): string {
-  return getJSTTimestamp().split('T')[0];
+  // 日本時間の日付を取得
+  const jstTimestamp = getJSTTimestamp();
+  return jstTimestamp.split('T')[0];
 }
 
 /**
@@ -68,3 +70,4 @@ export function formatJSTDate(timestamp: string): string {
     day: "2-digit",
   });
 }
+

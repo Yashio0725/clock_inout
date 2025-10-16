@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { formatJSTTime, formatJSTDate } from "@/lib/timezone";
 import { Michroma, Orbitron } from 'next/font/google';
 import PunchButton from "@/components/PunchButton";
 import ImageCard from "@/components/ImageCard";
@@ -133,11 +132,19 @@ export default function PunchPage() {
   };
 
   const formatTime = (timestamp: string) => {
-    return formatJSTTime(timestamp);
+    // UTC時刻をそのまま日本時間として表示
+    const date = new Date(timestamp);
+    const utcTime = date.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS部分を取得
+    return utcTime;
   };
 
   const formatDate = (timestamp: string) => {
-    return formatJSTDate(timestamp);
+    return new Date(timestamp).toLocaleDateString("ja-JP", {
+      timeZone: "Asia/Tokyo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
   };
 
   const formatDateEnglish = (timestamp: string) => {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveRecord } from "@/lib/storage";
-import { getJSTTimestamp, getJSTDate, formatJSTDateTime } from "@/lib/timezone";
+import { getJSTTimestamp } from "@/lib/timezone";
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,14 +31,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const timestamp = getJSTTimestamp();
+    const timestamp = getJSTTimestamp(); // 日本時間で記録
     const sanitizedComment = typeof comment === "string" && comment.trim().length > 0 ? comment.trim() : undefined;
     
     const record = {
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type,
       timestamp,
-      date: getJSTDate(), // 日本時間の日付（YYYY-MM-DD形式）
+      date: timestamp.split('T')[0], // 日本時間の日付（YYYY-MM-DD形式）
       comment: sanitizedComment,
     };
 
@@ -47,7 +47,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `${type} recorded successfully`,
-      timestamp: formatJSTDateTime(timestamp),
+      timestamp: new Date(timestamp).toLocaleString("ja-JP", { 
+        timeZone: "Asia/Tokyo",
+        hour12: false 
+      }),
       record,
     });
   } catch (error) {
@@ -63,6 +66,7 @@ export async function GET() {
   try {
     const { getRecords } = await import("@/lib/storage");
     const records = await getRecords();
+    
     
     return NextResponse.json(records);
   } catch (error) {

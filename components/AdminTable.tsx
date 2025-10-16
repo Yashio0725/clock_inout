@@ -1,5 +1,3 @@
-import { formatJSTDateTime } from "@/lib/timezone";
-
 interface AttendanceRecord {
   id: string;
   type: string;
@@ -14,7 +12,10 @@ interface AdminTableProps {
 
 export default function AdminTable({ records }: AdminTableProps) {
   const formatDateTime = (timestamp: string) => {
-    return formatJSTDateTime(timestamp);
+    // UTC時刻をそのまま日本時間として表示
+    const date = new Date(timestamp);
+    const utcDateTime = date.toISOString().replace('T', ' ').split('.')[0]; // YYYY-MM-DD HH:MM:SS
+    return utcDateTime;
   };
 
   const getTypeColor = (type: string) => {
